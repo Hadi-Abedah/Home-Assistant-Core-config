@@ -1,0 +1,13 @@
+- alias: "Evaluate Conditions When inverter_input Restarts or Becomes Availabe"
+  trigger:
+    - platform: state
+      entity_id: switch.sonoff_1001e5d0bf # inverter_input
+      from: 'unavailable'
+      to: 'on'
+    - platform: state
+      entity_id: switch.sonoff_1001e5d0bf # inverter_input
+      to: 'off'
+  action:
+    - delay: '00:00:20'  # Wait for 20 seconds to ensure the device is fully online
+    - service: script.evaluate_conditions_1
+

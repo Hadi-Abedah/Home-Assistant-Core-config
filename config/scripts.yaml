@@ -1,0 +1,11 @@
+# THIS ONE CHECS THE INVERTER_TO_FRIDGE STATE AND TURNS THE 
+#INVERTER_INPUT ONLY IF IT WAS OFF
+
+evaluate_conditions_1:
+  sequence:
+    - condition: state
+      entity_id: switch.sonoff_1001e606c3 # inverter_to_fridge
+      state: 'off'
+    - service: switch.turn_on
+      entity_id: switch.sonoff_1001e5d0bf # inverter_input
+
