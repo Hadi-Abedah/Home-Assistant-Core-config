@@ -14,3 +14,12 @@ sonoff:
 automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
+
+notify:
+  - name: WhatsApp
+    platform: rest
+    resource: https://api.callmebot.com/whatsapp.php
+    data:
+      source: HA
+      phone: !secret my_phone_num     # Replace with your phone number
+      apikey: !secret my_api_key      # Replace with your CallMeBot API key

@@ -1,4 +1,4 @@
-- alias: "Evaluate Conditions When inverter_input Restarts or Becomes Availabe"
+- alias: "Evaluate Conditions When inverter_input Restarts or Becomes Available & Send Msg"
   trigger:
     - platform: state
       entity_id: switch.sonoff_1001e5d0bf # inverter_input
@@ -10,4 +10,17 @@
   action:
     - delay: '00:00:20'  # Wait for 20 seconds to ensure the device is fully online
     - service: script.evaluate_conditions_1
+    - service: notify.WhatsApp
+      data:
+        message: 'The grid power is ON'
+
+- alias: "Send Msg When inverter_input Becomes Unavailable"
+  trigger:
+    - platform: state
+      entity_id: switch.sonoff_1001e5d0bf  # inverter_input
+      to: 'unavailable'
+  action:
+    - service: notify.WhatsApp
+      data:
+        message: 'The grid power is OFF'
 
