@@ -8,11 +8,17 @@
       entity_id: switch.sonoff_1001e5d0bf # inverter_input
       to: 'off'
   action:
-    - delay: '00:00:20'  # Wait for 20 seconds to ensure the device is fully online
+    - variables:   # define variable that holds the value of now() 
+        inverter_available_time: "{{ now().timestamp() }}"  
+    - delay: '00:00:10'  # Wait for 10 seconds to ensure the device is fully online
     - service: script.evaluate_conditions_1
     - service: notify.WhatsApp
       data:
         message: 'The grid power is ON'
+    - service: input_text.set_value
+      data:
+        entity_id: input_text.inverter_last_available_time
+        value: "{{ inverter_available_time }}"
 
 - alias: "Send Msg When inverter_input Becomes Unavailable"
   trigger:
@@ -20,7 +26,13 @@
       entity_id: switch.sonoff_1001e5d0bf  # inverter_input
       to: 'unavailable'
   action:
+    - variables:
+        inverter_last_available_time: "{{ states('input_text.inverter_last_available_time') | float }}"
+        duration: "{{ now().timestamp() - inverter_last_available_time }}"
     - service: notify.WhatsApp
       data:
-        message: 'The grid power is OFF'
-
+        message: >
+          {% set hours = (duration // 3600) | int %}
+          {% set minutes = ((duration % 3600) // 60) | int %}
+          {% set seconds = (duration % 60) | int %}
+          The grid power is OFF. It was available for {{ hours }} hours, {{ minutes }} minutes, and {{ seconds }} seconds.

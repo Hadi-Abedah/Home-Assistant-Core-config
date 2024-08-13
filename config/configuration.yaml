@@ -15,6 +15,7 @@ automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
 
+# Setting the whatsapp notification service
 notify:
   - name: WhatsApp
     platform: rest
@@ -23,3 +24,10 @@ notify:
       source: HA
       phone: !secret my_phone_num     # Replace with your phone number
       apikey: !secret my_api_key      # Replace with your CallMeBot API key
+
+# This is an integration that lets me store and manipulate values
+input_text:
+  inverter_last_available_time:
+    name: Inverter Last Available Time
+    initial: '0'
+    mode: text
