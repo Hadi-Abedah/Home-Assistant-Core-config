@@ -25,9 +25,9 @@ notify:
       phone: !secret my_phone_num     # Replace with your phone number
       apikey: !secret my_api_key      # Replace with your CallMeBot API key
 
-# This is an integration that lets me store and manipulate values
-input_text:
-  inverter_last_available_time:
-    name: Inverter Last Available Time
-    initial: '0'
-    mode: text
+# This is an integration that lets me store and manipulate datetime values
+input_datetime:
+  datetime_when_inverter_input_is_available:
+    name: Datetime When Inverter Input Is Available
+    has_date: true
+    has_time: true
