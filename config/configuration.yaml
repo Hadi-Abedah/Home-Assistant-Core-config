@@ -31,3 +31,8 @@ input_datetime:
     name: Datetime When Inverter Input Is Available
     has_date: true
     has_time: true
+# This will sum all periods that inverter_input was available in 
+  inverter_input_available_periods:
+    name: inverter_input_available_periods
+    has_date: true
+    has_time: true

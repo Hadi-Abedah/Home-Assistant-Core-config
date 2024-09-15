@@ -20,7 +20,7 @@
         entity_id: input_datetime.datetime_when_inverter_input_is_available
         datetime: "{{ inverter_available_datetime }}"
 
-- alias: "Send Msg When inverter_input Becomes Unavailable"
+- alias: "Send Msg When inverter_input Becomes Unavailable & Update Periods"
   trigger:
     - platform: state
       entity_id: switch.sonoff_1001e5d0bf  # inverter_input
@@ -29,7 +29,10 @@
   action:
     - variables:
         inverter_input_latest_available_datetime: "{{ state_attr('input_datetime.datetime_when_inverter_input_is_available', 'timestamp') | float }}"
-        duration: "{{ utcnow().timestamp() - inverter_input_latest_available_datetime }}"
+        duration: "{{ utcnow().timestamp() - inverter_input_latest_available_datetime }}"  # Duration in seconds
+        current_period: "{{ state_attr('input_datetime.inverter_input_available_periods', 'timestamp') | float }}"  # Existing stored period
+
+    # Notify via WhatsApp
     - service: notify.WhatsApp
       data:
         message: >
@@ -37,3 +40,32 @@
           {% set minutes = ((duration % 3600) // 60) | int %}
           {% set seconds = (duration % 60) | int %}
           The grid power is OFF. It was available for {{ hours }} hours, {{ minutes }} minutes, and {{ seconds }} seconds.
+
+    # Update the input_datetime with the new accumulated period
+    - service: input_datetime.set_datetime
+      data:
+        entity_id: input_datetime.inverter_input_available_periods
+        datetime: >
+          {{ (current_period + duration) | timestamp_custom('%Y-%m-%d %H:%M:%S', True) }}
+
+- alias: "Send Total Inverter Input Availability & Reset to Zero at Midnight"
+  trigger:
+    platform: time
+    at: '00:00:00'  # Runs at midnight
+  action:
+    # Send WhatsApp message with total availability periods
+    - service: notify.WhatsApp
+      data:
+        message: >
+          {% set total_duration = as_timestamp(states('input_datetime.inverter_input_available_periods')) - as_timestamp('1970-01-01 00:00:00') %}
+          {% set hours = (total_duration // 3600) | int %}
+          {% set minutes = ((total_duration % 3600) // 60) | int %}
+          {% set seconds = (total_duration % 60) | int %}
+          The total inverter input availability period for today was {{ hours }} hours, {{ minutes }} minutes, and {{ seconds }} seconds.
+    
+    # Reset the input_datetime to zero
+    - service: input_datetime.set_datetime
+      data:
+        entity_id: input_datetime.inverter_input_available_periods
+        datetime: "1970-01-01 00:00:00"  # Reset to Unix epoch (zero datetime)
+
