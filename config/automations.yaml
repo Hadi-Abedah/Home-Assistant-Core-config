@@ -30,53 +30,63 @@
         value: "{{ (current_total + duration) | int }}"
     - delay: '00:00:05'
     - service: script.evaluate_conditions_2
-    - service: script.evaluate_conditions_3
+    - service: script.evaluate_conditions_3b
 
 - alias: "Turn On inverter_to_fridge in the morning if Sun is good"
+  condition:
+    - condition: or
+      conditions:
+        - condition: state
+          entity_id: switch.sonoff_1001e5d0bf
+          state: 'off'
+        - condition: state
+          entity_id: switch.sonoff_1001e5d0bf
+          state: 'unavailable'
+
   trigger:
     - platform: time
       at: "10:00:00"
-  condition:
-    - condition: numeric_state
-      entity_id: sensor.home_hours_of_sun_day_0
-      above: 7
-    - condition: numeric_state
-      entity_id: sensor.home_cloud_cover_day_0
-      below: 21
-    - condition: numeric_state
-      entity_id: sensor.home_solar_irradiance_day_0
-      above: 3000
-    - condition: state 
-      entity_id: switch.sonoff_1001e5d0bf  # AC_input
-      state: 'unavailable'
+  #condition:
+  #  - condition: numeric_state
+  #    entity_id: sensor.home_hours_of_sun_day_0
+  #    above: 7
+  #  - condition: numeric_state
+  #    entity_id: sensor.home_cloud_cover_day_0
+  #    below: 21
+  #  - condition: numeric_state
+  #    entity_id: sensor.home_solar_irradiance_day_0
+  #    above: 3000
+  #  - condition: state 
+  #    entity_id: switch.sonoff_1001e5d0bf  # AC_input
+  #    state: 'unavailable'
   action:
     - service: switch.turn_on
       target:
         entity_id: switch.sonoff_1001e606c3  # inverter_to_fridge
   mode: single
 
-- alias: "Turn On inverter_to_fridge in the noon if Sun is moderate"
-  trigger:
-    - platform: time
-      at: "12:30:00"
-  condition:
-    - condition: numeric_state
-      entity_id: sensor.home_hours_of_sun_day_0
-      above: 5
-    - condition: numeric_state
-      entity_id: sensor.home_cloud_cover_day_0
-      below: 35
-    - condition: numeric_state
-      entity_id: sensor.home_solar_irradiance_day_0
-      above: 3000
-    - condition: state 
-      entity_id: switch.sonoff_1001e5d0bf  # AC_input
-      state: 'unavailable'
-  action:
-    - service: switch.turn_on
-      target:
-        entity_id: switch.sonoff_1001e606c3  # inverter_to_fridge
-  mode: single
+#- alias: "Turn On inverter_to_fridge in the noon if Sun is moderate"
+#  trigger:
+#    - platform: time
+#      at: "12:30:00"
+#  condition:
+#    - condition: numeric_state
+#      entity_id: sensor.home_hours_of_sun_day_0
+#      above: 5
+#    - condition: numeric_state
+#      entity_id: sensor.home_cloud_cover_day_0
+#      below: 35
+#    - condition: numeric_state
+#      entity_id: sensor.home_solar_irradiance_day_0
+#      above: 3000
+#    - condition: state 
+#      entity_id: switch.sonoff_1001e5d0bf  # AC_input
+#      state: 'unavailable'
+#  action:
+#    - service: switch.turn_on
+#      target:
+#        entity_id: switch.sonoff_1001e606c3  # inverter_to_fridge
+#  mode: single
 
 - alias: "Turn Off inverter_to_fridge at night"
   trigger:
